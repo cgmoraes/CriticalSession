@@ -21,14 +21,14 @@ void *client(void *params) {
     respond = 0;
   }
 }
-
 void *server() {
   while(1){
-    if(request != 0) respond = request;
-    else if(respond == 0) request = 0;
+    while(!(request != 0));
+    respond = request;
+    while(!(respond == 0))
+    request = 0;
   } 
 }
-
 int main(int argc, char *argv[]) {
   NUM_THREADS = atoi(argv[1]);
   int i;

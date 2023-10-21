@@ -15,17 +15,20 @@ void *client(void *params) {
   while (1){
     while(respond != data->tid) request = data->tid;
     int local = SUM;    
-    sleep(rand()%2);     
-    SUM = local + 1;    
-    printf("%d\n", SUM);
+    sleep(1);     
+    SUM = local + 1;
+    printf("Thread %d Printou:%d\n", data->tid, SUM);
+    fflush(0); 
     respond = 0;
   }
 }
 
 void *server() {
   while(1){
-    if(request != 0) respond = request;
-    else if(respond == 0) request = 0;
+    while(!(request != 0));
+    respond = request;
+    while(!(respond == 0))
+    request = 0;
   } 
 }
 
