@@ -4,23 +4,41 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-int NUM_THREADS, SUM = 0;
+int NUM_THREADS, request = 0, respond = 0, SUM = 0;
 
-void *client() {
+struct parameter {
+  int tid;
+};
+
+void *client(void *params) {
+  struct parameter *data = (struct parameter *)params;
   while (1){
+    request = data->tid;
     int local = SUM;    
     sleep(rand()%2);     
     SUM = local + 1;    
     printf("%d\n", SUM);
+    respond = 0;
   }
+}
+
+void *server() {
+  while(1){
+    if(request != 0) respond = request;
+    else if(respond == 0) request = 0;
+  } 
 }
 
 int main(int argc, char *argv[]) {
   NUM_THREADS = atoi(argv[1]);
   int i;
   pthread_t tids[NUM_THREADS];
-  for (i = 0; i < NUM_THREADS; i++) {
-    pthread_create(&tids[i], NULL, client, NULL);
+  struct parameter params[NUM_THREADS];
+  params[0].tid = 0;
+  pthread_create(&tids[0], NULL, server, &params[0]);
+  for (i = 1; i < NUM_THREADS; i++) {
+    params[i].tid = i;
+    pthread_create(&tids[i], NULL, client, &params[i]);
   }
   for (i = 0; i < NUM_THREADS; i++) {
     pthread_join(tids[i], NULL);
